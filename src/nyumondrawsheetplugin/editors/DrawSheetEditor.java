@@ -1,6 +1,9 @@
 package nyumondrawsheetplugin.editors;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.StringWriter;
 import java.nio.IntBuffer;
 import java.text.Collator;
@@ -11,8 +14,10 @@ import java.util.StringTokenizer;
 
 import javax.crypto.Mac;
 import javax.print.Doc;
+import javax.sound.sampled.Line;
 import javax.swing.text.TabableView;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -91,6 +96,26 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	void createPage0() {
 		try {
 			editor = new TextEditor();
+			try{
+				// 今編集しているファイル
+				IFile iFile = ((FileEditorInput)getEditorInput()).getFile();
+				File file = iFile.getLocation().toFile();
+
+				// 読む
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				while(br.ready()){
+					String line = br.readLine();
+					String[] dotstrs = line.split(",");
+					int[] dots = new int[4];
+					for(int i = 0; i < 4; i++){
+						dots[i]= Integer.parseInt(dotstrs[i]); 
+					}
+					lineList.add(dots);
+				}
+			}
+			catch(Exception ex){
+			}
+			
 			int index = addPage(editor, getEditorInput());
 			setPageText(index, editor.getTitle());
 		} catch (PartInitException e) {
