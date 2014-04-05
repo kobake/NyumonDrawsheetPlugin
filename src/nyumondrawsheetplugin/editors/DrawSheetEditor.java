@@ -89,6 +89,18 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		super();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
+	
+	private void redraw(){
+		canvas.update();
+		
+		// 保管しておいた値を取り出し描画
+		Iterator<int[]> it = lineList.iterator();
+		while(it.hasNext()){
+			int[] dots = it.next();
+			gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
+		}
+	}
+	
 	/**
 	 * Creates page 0 of the multi-page editor,
 	 * which contains a text editor.
@@ -178,6 +190,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 			@Override
 			public void mouseUp(MouseEvent e) {
 				if(DRAWING == 1){
+					lineToDoc();
 					DRAWING = 0;
 				}
 			}
@@ -205,14 +218,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		canvas.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
-				canvas.update();
-				
-				// 保管しておいた値を取り出し描画
-				Iterator<int[]> it = lineList.iterator();
-				while(it.hasNext()){
-					int[] dots = it.next();
-					gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
-				}
+				redraw();
 			}
 
 			@Override
@@ -231,6 +237,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		createPage0();
 		createPage1();
 		setActivePage(1); // 起動時に開くページの設定
+		redraw();
 	}
 	
 	/**
@@ -282,33 +289,29 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	public boolean isSaveAsAllowed() {
 		return true;
 	}
+	
+	private void lineToDoc(){
+		doc = editor.getDocumentProvider().getDocument(getEditorInput());
+		String textstr = new String();
+		Iterator<int[]> it = lineList.iterator();
+		while(it.hasNext()){
+			int[] dots = it.next();
+			for(int i = 0; i < 3; i++){
+				textstr += Integer.toString(dots[i]) + ","; 
+			}
+			textstr += dots[3] + "\n";
+		}
+		doc.set(textstr);
+	}
 	/**
 	 * Calculates the contents of page 2 when the it is activated.
 	 */
 	protected void pageChange(int newPageIndex) {
 		super.pageChange(newPageIndex);
 		if (newPageIndex == 0) {
-			doc = editor.getDocumentProvider().getDocument(getEditorInput());
-			String textstr = new String();
-			Iterator<int[]> it = lineList.iterator();
-			while(it.hasNext()){
-				int[] dots = it.next();
-				for(int i = 0; i < 3; i++){
-					textstr += Integer.toString(dots[i]) + ","; 
-				}
-				textstr += dots[3] + "\n";
-			}
-			doc.set(textstr);
+			lineToDoc();
 		}
 		else if(newPageIndex == 1){
-			canvas.update();
-			
-			// 保管しておいた値を取り出し描画
-			Iterator<int[]> it = lineList.iterator();
-			while(it.hasNext()){
-				int[] dots = it.next();
-				gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
-			}
 		}
 	}
 	/**
