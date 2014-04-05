@@ -22,6 +22,8 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -171,6 +173,25 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 						lastx, lasty, currentx, currenty
 					});
 				}
+			}
+		});
+		
+		// リスナ設定：フォーカス
+		canvas.addFocusListener(new FocusListener(){
+			@Override
+			public void focusGained(FocusEvent e) {
+				canvas.update();
+				
+				// 保管しておいた値を取り出し描画
+				Iterator<int[]> it = lineList.iterator();
+				while(it.hasNext()){
+					int[] dots = it.next();
+					gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
 			}
 		});
 
