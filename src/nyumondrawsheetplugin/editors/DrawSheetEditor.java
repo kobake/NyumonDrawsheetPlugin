@@ -2,12 +2,15 @@ package nyumondrawsheetplugin.editors;
 
 
 import java.io.StringWriter;
+import java.nio.IntBuffer;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.crypto.Mac;
+import javax.print.Doc;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -15,6 +18,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
@@ -42,6 +46,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.internal.handlers.WizardHandler.New;
 
 /**
  * An example showing how to create a multi-page editor.
@@ -53,6 +58,8 @@ import org.eclipse.ui.ide.IDE;
  * </ul>
  */
 public class DrawSheetEditor extends MultiPageEditorPart implements IResourceChangeListener{
+	ArrayList<int[]> lineList = new ArrayList<int[]>();
+	private IDocument doc;
 
 	/** The text editor used in page 0. */
 	private TextEditor editor;
@@ -158,6 +165,10 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 					currentx = e.x;
 					currenty = e.y;
 					gc.drawLine(lastx, lasty, currentx, currenty);
+					// リスト構造への格納
+					lineList.add(new int[]{
+						lastx, lasty, currentx, currenty
+					});
 				}
 			}
 		});
@@ -229,8 +240,18 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	 */
 	protected void pageChange(int newPageIndex) {
 		super.pageChange(newPageIndex);
-		if (newPageIndex == 2) {
-			//sortWords();
+		if (newPageIndex == 0) {
+			doc = editor.getDocumentProvider().getDocument(getEditorInput());
+			String textstr = new String();
+			Iterator<int[]> it = lineList.iterator();
+			while(it.hasNext()){
+				int[] dots = it.next();
+				for(int i = 0; i < 3; i++){
+					textstr += Integer.toString(dots[i]) + ","; 
+				}
+				textstr += dots[3] + "\n";
+			}
+			doc.set(textstr);
 		}
 	}
 	/**
