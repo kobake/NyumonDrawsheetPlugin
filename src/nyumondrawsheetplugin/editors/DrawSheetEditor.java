@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
+import javax.crypto.Mac;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -15,14 +17,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FontDialog;
@@ -47,6 +58,11 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	private TextEditor editor;
 
 	/** The font chosen in page 1. */
+	private Canvas canvas;
+	private int currentx, currenty;
+	static int DRAWING;
+	static GC gc;
+	
 	private Font font;
 
 	/** The text widget used in page 2. */
@@ -82,10 +98,15 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	void createPage1() {
 
 		Composite composite = new Composite(getContainer(), SWT.NONE);
+		/*
 		GridLayout layout = new GridLayout();
 		composite.setLayout(layout);
 		layout.numColumns = 2;
+		*/
+		RowLayout rl = new RowLayout();
+		composite.setLayout(rl);
 
+		/*
 		Button fontButton = new Button(composite, SWT.NONE);
 		GridData gd = new GridData(GridData.BEGINNING);
 		gd.horizontalSpan = 2;
@@ -97,32 +118,63 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 				setFont();
 			}
 		});
+		*/
+		canvas = new Canvas(composite, SWT.NONE);
+		canvas.setLayoutData(new RowData(300, 200));
+		
+		Color color = new Color(Display.getCurrent(), new RGB(225, 225, 255));
+		canvas.setBackground(color);
+		
+		gc = new GC(canvas);
+		
+		DRAWING = 0;
+		
+		// リスナ設定
+		canvas.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseDown(MouseEvent e) {
+				if(DRAWING == 0){
+					DRAWING = 1;
+					currentx = e.x;
+					currenty = e.y;
+				}
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if(DRAWING == 1){
+					DRAWING = 0;
+				}
+			}
+		});
+		
+		// リスナ設定：マウス移動
+		canvas.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				if(DRAWING == 1){
+					int lastx = currentx;
+					int lasty = currenty;
+					currentx = e.x;
+					currenty = e.y;
+					gc.drawLine(lastx, lasty, currentx, currenty);
+				}
+			}
+		});
 
 		int index = addPage(composite);
-		setPageText(index, "Properties");
+		setPageText(index, "きゃんばす");
 	}
-	/**
-	 * Creates page 2 of the multi-page editor,
-	 * which shows the sorted text.
-	 */
-	void createPage2() {
-		Composite composite = new Composite(getContainer(), SWT.NONE);
-		FillLayout layout = new FillLayout();
-		composite.setLayout(layout);
-		text = new StyledText(composite, SWT.H_SCROLL | SWT.V_SCROLL);
-		text.setEditable(false);
-
-		int index = addPage(composite);
-		setPageText(index, "Preview");
-	}
+		
 	/**
 	 * Creates the pages of the multi-page editor.
 	 */
 	protected void createPages() {
 		createPage0();
 		createPage1();
-		createPage2();
+		setActivePage(1); // 起動時に開くページの設定
 	}
+	
 	/**
 	 * The <code>MultiPageEditorPart</code> implementation of this 
 	 * <code>IWorkbenchPart</code> method disposes all nested editors.
@@ -178,7 +230,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	protected void pageChange(int newPageIndex) {
 		super.pageChange(newPageIndex);
 		if (newPageIndex == 2) {
-			sortWords();
+			//sortWords();
 		}
 	}
 	/**
@@ -198,42 +250,5 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 				}            
 			});
 		}
-	}
-	/**
-	 * Sets the font related data to be applied to the text in page 2.
-	 */
-	void setFont() {
-		FontDialog fontDialog = new FontDialog(getSite().getShell());
-		fontDialog.setFontList(text.getFont().getFontData());
-		FontData fontData = fontDialog.open();
-		if (fontData != null) {
-			if (font != null)
-				font.dispose();
-			font = new Font(text.getDisplay(), fontData);
-			text.setFont(font);
-		}
-	}
-	/**
-	 * Sorts the words in page 0, and shows them in page 2.
-	 */
-	void sortWords() {
-
-		String editorText =
-			editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
-
-		StringTokenizer tokenizer =
-			new StringTokenizer(editorText, " \t\n\r\f!@#\u0024%^&*()-_=+`~[]{};:'\",.<>/?|\\");
-		ArrayList editorWords = new ArrayList();
-		while (tokenizer.hasMoreTokens()) {
-			editorWords.add(tokenizer.nextToken());
-		}
-
-		Collections.sort(editorWords, Collator.getInstance());
-		StringWriter displayText = new StringWriter();
-		for (int i = 0; i < editorWords.size(); i++) {
-			displayText.write(((String) editorWords.get(i)));
-			displayText.write(System.getProperty("line.separator"));
-		}
-		text.setText(displayText.toString());
 	}
 }
