@@ -1,7 +1,18 @@
 package nyumondrawsheetplugin.editors;
 
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.net.URL;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction;
+
+import nyumondrawsheetplugin.Activator;
+
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -20,7 +31,8 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  */
 public class DrawSheetEditorContributor extends MultiPageEditorActionBarContributor {
 	private IEditorPart activeEditorPart;
-	private Action sampleAction;
+	private Action clearAction;
+	private Action restoreAction;
 	/**
 	 * Creates a multi-page contributor.
 	 */
@@ -81,23 +93,47 @@ public class DrawSheetEditorContributor extends MultiPageEditorActionBarContribu
 		}
 	}
 	private void createActions() {
-		sampleAction = new Action() {
+		clearAction = new Action() {
 			public void run() {
-				MessageDialog.openInformation(null, "NyumonDrawsheetPlugin", "Sample Action Executed");
+				// 編集中のエディタを取得
+				DrawSheetEditor currentEditor = 
+						(DrawSheetEditor)getPage().getActiveEditor();
+				currentEditor.clearLineList();
+				currentEditor.clearCanvas();
+				//MessageDialog.openInformation(null, "NyumonDrawsheetPlugin", "Sample Action Executed");
 			}
 		};
-		sampleAction.setText("Sample Action");
-		sampleAction.setToolTipText("Sample Action tool tip");
-		sampleAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(IDE.SharedImages.IMG_OBJS_TASK_TSK));
+		clearAction.setText("全消去しますよ");
+		clearAction.setToolTipText("お絵かきをクリアするのです");
+		clearAction.setImageDescriptor(getIconImageDescriptor("nofrog.gif"));
+		
+		restoreAction = new Action(){
+			@Override
+			public void run() {
+				DrawSheetEditor currentEditor = (DrawSheetEditor)getPage().getActiveEditor();
+				currentEditor.restoreCanvas();
+			}
+		};
+		restoreAction.setText("強制復元");
+		restoreAction.setToolTipText("お絵かきを復元するのです");
+		restoreAction.setImageDescriptor(getIconImageDescriptor("frog.gif"));
 	}
 	public void contributeToMenu(IMenuManager manager) {
-		IMenuManager menu = new MenuManager("Editor &Menu");
+		IMenuManager menu = new MenuManager("DrawSheet");
 		manager.prependToGroup(IWorkbenchActionConstants.MB_ADDITIONS, menu);
-		menu.add(sampleAction);
+		menu.add(clearAction);
+		menu.add(restoreAction);
 	}
 	public void contributeToToolBar(IToolBarManager manager) {
 		manager.add(new Separator());
-		manager.add(sampleAction);
+		manager.add(clearAction);
+		manager.add(restoreAction);
+	}
+	public ImageDescriptor getIconImageDescriptor(String filename){
+		Activator activator = Activator.getDefault();
+		String filePathName = "icons/" + filename;
+		URL url = activator.find(new Path(filePathName));
+		ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
+		return descriptor;
 	}
 }

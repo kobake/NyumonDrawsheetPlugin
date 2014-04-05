@@ -90,16 +90,6 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
 	
-	private void redraw(){
-		canvas.update();
-		
-		// 保管しておいた値を取り出し描画
-		Iterator<int[]> it = lineList.iterator();
-		while(it.hasNext()){
-			int[] dots = it.next();
-			gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
-		}
-	}
 	
 	/**
 	 * Creates page 0 of the multi-page editor,
@@ -218,7 +208,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		canvas.addFocusListener(new FocusListener(){
 			@Override
 			public void focusGained(FocusEvent e) {
-				redraw();
+				restoreCanvas();
 			}
 
 			@Override
@@ -237,7 +227,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		createPage0();
 		createPage1();
 		setActivePage(1); // 起動時に開くページの設定
-		redraw();
+		restoreCanvas();
 	}
 	
 	/**
@@ -303,6 +293,23 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		}
 		doc.set(textstr);
 	}
+	public void restoreCanvas(){
+		canvas.update();
+		
+		// 保管しておいた値を取り出し描画
+		Iterator<int[]> it = lineList.iterator();
+		while(it.hasNext()){
+			int[] dots = it.next();
+			gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
+		}
+	}
+	public void clearCanvas(){
+		canvas.redraw();
+	}
+	public void clearLineList(){
+		lineList = new ArrayList<int[]>();
+	}
+	
 	/**
 	 * Calculates the contents of page 2 when the it is activated.
 	 */
