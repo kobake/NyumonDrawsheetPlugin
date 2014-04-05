@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 
 import javax.crypto.Mac;
 import javax.print.Doc;
+import javax.swing.text.TabableView;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -252,6 +253,16 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 				textstr += dots[3] + "\n";
 			}
 			doc.set(textstr);
+		}
+		else if(newPageIndex == 1){
+			canvas.update();
+			
+			// 保管しておいた値を取り出し描画
+			Iterator<int[]> it = lineList.iterator();
+			while(it.hasNext()){
+				int[] dots = it.next();
+				gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
+			}
 		}
 	}
 	/**
