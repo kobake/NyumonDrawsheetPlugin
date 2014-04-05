@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="ドローシート"
+            extensions="dsh"
+            icon="icons/frog.gif"
+            contributorClass="nyumondrawsheetplugin.editors.DrawSheetEditorContributor"
+            class="nyumondrawsheetplugin.editors.DrawSheetEditor"
+            id="nyumondrawsheetplugin.editors.DrawSheetEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="どろーカテゴリ"
+            id="NyumonDrawsheetPlugin">
+      </category>
+      <wizard
+            name="どろーウィザード"
+            icon="icons/frog.gif"
+            category="NyumonDrawsheetPlugin"
+            class="nyumondrawsheetplugin.wizards.DrawSheetNewWizard"
+            id="nyumondrawsheetplugin.wizards.DrawSheetNewWizard">
+      </wizard>
+   </extension>
+
+</plugin>
