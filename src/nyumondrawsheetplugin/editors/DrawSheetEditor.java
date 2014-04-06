@@ -4,19 +4,9 @@ package nyumondrawsheetplugin.editors;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.StringWriter;
-import java.nio.IntBuffer;
-import java.security.acl.Owner;
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
-import javax.crypto.Mac;
-import javax.print.Doc;
-import javax.sound.sampled.Line;
-import javax.swing.text.TabableView;
 
 import nyumondrawsheetplugin.util.DrawSheetColorTable;
 
@@ -31,36 +21,25 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.*;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.handlers.WizardHandler.New;
 
 /**
  * An example showing how to create a multi-page editor.
@@ -91,10 +70,10 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	static int DRAWING;
 	static GC gc;
 	
-	private Font font;
+	//private Font font;
 
 	/** The text widget used in page 2. */
-	private StyledText text;
+	//private StyledText text;
 	/**
 	 * Creates a multi-page editor example.
 	 */
@@ -141,6 +120,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 					}
 					lineList.add(dots);
 				}
+				br.close();
 			}
 			catch(Exception ex){
 			}

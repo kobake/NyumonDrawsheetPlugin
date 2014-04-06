@@ -1,24 +1,17 @@
 package nyumondrawsheetplugin.editors;
 
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction;
 
 import nyumondrawsheetplugin.Activator;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -132,6 +125,7 @@ public class DrawSheetEditorContributor extends MultiPageEditorActionBarContribu
 	public ImageDescriptor getIconImageDescriptor(String filename){
 		Activator activator = Activator.getDefault();
 		String filePathName = "icons/" + filename;
+		@SuppressWarnings("deprecation")
 		URL url = activator.find(new Path(filePathName));
 		ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
 		return descriptor;

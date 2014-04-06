@@ -3,29 +3,35 @@ package nyumondrawsheetplugin.views;
 
 import java.net.URL;
 
-import javax.management.Descriptor;
-
 import nyumondrawsheetplugin.Activator;
 import nyumondrawsheetplugin.editors.DrawSheetEditor;
 import nyumondrawsheetplugin.util.DrawSheetColorTable;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.internal.handlers.WizardHandler.New;
-import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.Path;
-//import org.eclipse.core.internal.runtime.Activator;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.ViewPart;
+//import org.eclipse.core.internal.runtime.Activator;
 
 
 /**
@@ -100,6 +106,7 @@ public class PaletteView extends ViewPart {
 		public Image getImage(Object obj) {
 			Activator activator = Activator.getDefault();
 			String filename = "icons/" + getText(obj).toLowerCase() + ".gif";
+			@SuppressWarnings("deprecation")
 			URL url = activator.find(new Path(filename));
 			ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
 			Image img = descriptor.createImage();
@@ -189,6 +196,7 @@ public class PaletteView extends ViewPart {
 		//	getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		Activator activator = Activator.getDefault();
 		String filename = "icons/palette.gif";
+		@SuppressWarnings("deprecation")
 		URL url = activator.find(new Path(filename));
 		ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
 		selectAction.setImageDescriptor(descriptor);
@@ -214,12 +222,14 @@ public class PaletteView extends ViewPart {
 			}
 		});
 	}
+	/*
 	private void showMessage(String message) {
 		MessageDialog.openInformation(
 			viewer.getControl().getShell(),
 			"ぱれっとビューだよ",
 			message);
 	}
+	*/
 	
 	private void selectColor(int index){
 		//Color color = new Color(Display.getCurrent(), rgbs[index]);
