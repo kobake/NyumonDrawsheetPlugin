@@ -37,6 +37,9 @@
                relationship="right"
                relative="org.eclipse.ui.views.ProblemView">
          </view>
+         <newWizardShortcut
+               id="nyumondrawsheetplugin.wizards.DrawSheetNewWizard">
+         </newWizardShortcut>
       </perspectiveExtension>
    </extension>
    <extension
