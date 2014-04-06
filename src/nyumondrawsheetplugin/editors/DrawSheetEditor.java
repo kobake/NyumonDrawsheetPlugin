@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.StringWriter;
 import java.nio.IntBuffer;
+import java.security.acl.Owner;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +25,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
@@ -51,6 +54,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FontDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.*;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
@@ -72,6 +76,11 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	private IDocument doc;
 	int m_colorNumber;
 	static RGB[] rgbs = DrawSheetColorTable.getRGBs();
+	
+	private static final String OWNER_TITLE = "OWNER:";
+	private static final String OWNER_PROPERTY = "OWNER";
+	private static final String DEFAULT_OWNER = "不明な作者";
+	private Label m_ownerLabel;
 
 	/** The text editor used in page 0. */
 	private TextEditor editor;
@@ -95,6 +104,20 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	}
 	
 	
+	public void restoreLabel(){
+		try{
+			IFile iFile = ((FileEditorInput)getEditorInput()).getFile();
+			String owner = iFile.getPersistentProperty(new QualifiedName("", OWNER_PROPERTY));
+			if(owner == null || owner.length() <= 0){
+				owner = DEFAULT_OWNER;
+			}
+			m_ownerLabel.setText(OWNER_TITLE + owner);
+		}
+		catch(CoreException ex){
+			m_ownerLabel.setText("ほげエラー");
+		}
+	}
+
 	/**
 	 * Creates page 0 of the multi-page editor,
 	 * which contains a text editor.
@@ -132,6 +155,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 				e.getStatus());
 		}
 	}
+	
 	/**
 	 * Creates page 1 of the multi-page editor,
 	 * which allows you to change the font used in page 2.
@@ -165,6 +189,10 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		
 		Color color = new Color(Display.getCurrent(), new RGB(225, 225, 255));
 		canvas.setBackground(color);
+		
+		m_ownerLabel = new Label(composite, SWT.WRAP);
+		m_ownerLabel.setLayoutData(new RowData(200, 60));
+		restoreLabel();
 		
 		gc = new GC(canvas);
 		
@@ -320,6 +348,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 			// 次からの要素が座標データ
 			gc.drawLine(dots[1], dots[2], dots[3], dots[4]);
 		}
+		restoreLabel();
 	}
 	public void clearCanvas(){
 		canvas.redraw();

@@ -59,5 +59,19 @@
             name="ぱれっとビューだよ">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="nyumondrawsheetplugin.properties.DrawSheetPropertyPage"
+            id="nyumondrawsheetplugin.properties.samplePropertyPage"
+            name="ドロープロパティページ"
+            nameFilter="*.dsh">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IFile">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
 
 </plugin>
