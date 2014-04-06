@@ -6,14 +6,18 @@ import java.net.URL;
 import javax.management.Descriptor;
 
 import nyumondrawsheetplugin.Activator;
+import nyumondrawsheetplugin.editors.DrawSheetEditor;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.handlers.WizardHandler.New;
 import org.eclipse.ui.part.*;
 import org.eclipse.core.runtime.Path;
 //import org.eclipse.core.internal.runtime.Activator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.*;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.jface.action.*;
@@ -189,7 +193,12 @@ public class PaletteView extends ViewPart {
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				showMessage("Double-click detected on "+obj.toString());
+				//showMessage("Double-click detected on "+obj.toString());
+				for(int i = 0; i < colorNames.length; i++){
+					if(colorNames[i].equals(obj.toString())){
+						selectColor(i);
+					}
+				}
 			}
 		};
 	}
@@ -206,6 +215,13 @@ public class PaletteView extends ViewPart {
 			viewer.getControl().getShell(),
 			"ぱれっとビューだよ",
 			message);
+	}
+	
+	private void selectColor(int index){
+		Color color = new Color(Display.getCurrent(), rgbs[index]);
+		DrawSheetEditor currentEditor = (DrawSheetEditor)getSite().getPage().getActiveEditor();
+		GC gc = currentEditor.getGC();
+		gc.setForeground(color);
 	}
 
 	/**
