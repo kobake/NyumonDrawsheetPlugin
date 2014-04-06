@@ -339,4 +339,8 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 			});
 		}
 	}
+	
+	public GC getGC(){
+		return gc;
+	}
 }
