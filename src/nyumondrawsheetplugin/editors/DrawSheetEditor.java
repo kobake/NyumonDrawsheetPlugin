@@ -17,6 +17,8 @@ import javax.print.Doc;
 import javax.sound.sampled.Line;
 import javax.swing.text.TabableView;
 
+import nyumondrawsheetplugin.util.DrawSheetColorTable;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -68,6 +70,8 @@ import org.eclipse.ui.internal.handlers.WizardHandler.New;
 public class DrawSheetEditor extends MultiPageEditorPart implements IResourceChangeListener{
 	ArrayList<int[]> lineList = new ArrayList<int[]>();
 	private IDocument doc;
+	int m_colorNumber;
+	static RGB[] rgbs = DrawSheetColorTable.getRGBs();
 
 	/** The text editor used in page 0. */
 	private TextEditor editor;
@@ -108,8 +112,8 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 				while(br.ready()){
 					String line = br.readLine();
 					String[] dotstrs = line.split(",");
-					int[] dots = new int[4];
-					for(int i = 0; i < 4; i++){
+					int[] dots = new int[5];
+					for(int i = 0; i < 5; i++){
 						dots[i]= Integer.parseInt(dotstrs[i]); 
 					}
 					lineList.add(dots);
@@ -165,6 +169,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		gc = new GC(canvas);
 		
 		DRAWING = 0;
+		m_colorNumber = 0;
 		
 		// リスナ設定
 		canvas.addMouseListener(new MouseAdapter(){
@@ -191,14 +196,22 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 			@Override
 			public void mouseMove(MouseEvent e) {
 				if(DRAWING == 1){
+					// 座標
 					int lastx = currentx;
 					int lasty = currenty;
 					currentx = e.x;
 					currenty = e.y;
+					
+					// 色
+					Color fcolor = new Color(Display.getCurrent(), rgbs[m_colorNumber]);
+					gc.setForeground(fcolor);
+					
+					// 描画
 					gc.drawLine(lastx, lasty, currentx, currenty);
+					
 					// リスト構造への格納
 					lineList.add(new int[]{
-						lastx, lasty, currentx, currenty
+						m_colorNumber, lastx, lasty, currentx, currenty
 					});
 				}
 			}
@@ -286,21 +299,26 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 		Iterator<int[]> it = lineList.iterator();
 		while(it.hasNext()){
 			int[] dots = it.next();
-			for(int i = 0; i < 3; i++){
+			for(int i = 0; i < 4; i++){
 				textstr += Integer.toString(dots[i]) + ","; 
 			}
-			textstr += dots[3] + "\n";
+			textstr += dots[4] + "\n";
 		}
 		doc.set(textstr);
 	}
 	public void restoreCanvas(){
 		canvas.update();
 		
-		// 保管しておいた値を取り出し描画
 		Iterator<int[]> it = lineList.iterator();
 		while(it.hasNext()){
 			int[] dots = it.next();
-			gc.drawLine(dots[0], dots[1], dots[2], dots[3]);
+			
+			// 最初の要素は色データ
+			Color fcolor = new Color(Display.getCurrent(), rgbs[dots[0]]);
+			gc.setForeground(fcolor);
+			
+			// 次からの要素が座標データ
+			gc.drawLine(dots[1], dots[2], dots[3], dots[4]);
 		}
 	}
 	public void clearCanvas(){
@@ -342,5 +360,8 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	
 	public GC getGC(){
 		return gc;
+	}
+	public void setColorNumber(int number){
+		m_colorNumber = number;
 	}
 }

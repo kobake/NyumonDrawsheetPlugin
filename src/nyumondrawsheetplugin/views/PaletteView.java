@@ -7,6 +7,7 @@ import javax.management.Descriptor;
 
 import nyumondrawsheetplugin.Activator;
 import nyumondrawsheetplugin.editors.DrawSheetEditor;
+import nyumondrawsheetplugin.util.DrawSheetColorTable;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -57,14 +58,14 @@ public class PaletteView extends ViewPart {
 	private Action action2;
 	private Action doubleClickAction;
 	
+	/*
 	static final RGB[] rgbs = {
 		new RGB(0, 0, 0),
 		new RGB(0, 0, 255),
 		new RGB(255, 0, 0)
 	};
-	static final String[] colorNames = new String[]{
-		"Black", "Blue", "Red"
-	};
+	*/
+	static final String[] colorNames = DrawSheetColorTable.getColorNames();
 
 	/*
 	 * The content provider class is responsible for
@@ -218,10 +219,11 @@ public class PaletteView extends ViewPart {
 	}
 	
 	private void selectColor(int index){
-		Color color = new Color(Display.getCurrent(), rgbs[index]);
+		//Color color = new Color(Display.getCurrent(), rgbs[index]);
 		DrawSheetEditor currentEditor = (DrawSheetEditor)getSite().getPage().getActiveEditor();
-		GC gc = currentEditor.getGC();
-		gc.setForeground(color);
+		//GC gc = currentEditor.getGC();
+		//gc.setForeground(color);
+		currentEditor.setColorNumber(index);
 	}
 
 	/**
