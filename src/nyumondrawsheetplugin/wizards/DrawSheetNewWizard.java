@@ -28,7 +28,11 @@ import org.eclipse.ui.ide.IDE;
 
 public class DrawSheetNewWizard extends Wizard implements INewWizard {
 	private DrawSheetNewWizardPage page;
+	private DrawSheetNextWizardPage nextPage;
 	private ISelection selection;
+	
+	private static final String OWNER_PROPERTY = "OWNER";
+	private String owner = "不明なオーナー";
 
 	/**
 	 * Constructor for DrawSheetNewWizard.
@@ -45,6 +49,9 @@ public class DrawSheetNewWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		page = new DrawSheetNewWizardPage(selection);
 		addPage(page);
+		
+		nextPage = new DrawSheetNextWizardPage(selection);
+		addPage(nextPage);
 	}
 
 	/**
@@ -55,6 +62,9 @@ public class DrawSheetNewWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
+		
+		owner = nextPage.getOwner(); // 追記
+		
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
@@ -106,6 +116,9 @@ public class DrawSheetNewWizard extends Wizard implements INewWizard {
 				file.create(stream, true, monitor);
 			}
 			stream.close();
+			
+			// 追記
+			file.setPersistentProperty(new QualifiedName("", OWNER_PROPERTY), owner);
 		} catch (IOException e) {
 		}
 		monitor.worked(1);
@@ -129,7 +142,7 @@ public class DrawSheetNewWizard extends Wizard implements INewWizard {
 
 	private InputStream openContentStream() {
 		String contents =
-			"This is the initial file contents for *.dsh file that should be word-sorted in the Preview page of the multi-page editor";
+			""; // 空にしておく。openContentStream自体を消すのはダメ！
 		return new ByteArrayInputStream(contents.getBytes());
 	}
 

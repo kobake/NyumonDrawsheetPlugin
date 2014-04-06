@@ -40,8 +40,8 @@ public class DrawSheetNewWizardPage extends WizardPage {
 	 */
 	public DrawSheetNewWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle("Multi-page Editor File");
-		setDescription("This wizard creates a new file with *.dsh extension that can be opened by a multi-page editor.");
+		setTitle("ドローウィザード1ページ目ですよ");
+		setDescription("キャンバスにマウスでお絵かきする何か");
 		this.selection = selection;
 	}
 
