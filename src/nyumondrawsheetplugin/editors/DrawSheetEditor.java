@@ -336,6 +336,7 @@ public class DrawSheetEditor extends MultiPageEditorPart implements IResourceCha
 	}
 	public void restoreCanvas(){
 		canvas.update();
+		gc = new GC(canvas);
 		
 		Iterator<int[]> it = lineList.iterator();
 		while(it.hasNext()){
